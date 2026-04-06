@@ -30,7 +30,7 @@ jobs:
         run: python scripts/update_proxies.py
 
       - name: Filter ChatGPT Proxies
-        run: python scripts/filter_chatgpt_proxies.py --timeout 8 --max-workers 30
+        run: python scripts/filter_chatgpt_proxies.py --timeout 6 --max-workers 60
 
       - name: Commit Changes If Any
         env:
