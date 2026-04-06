@@ -29,18 +29,21 @@ jobs:
       - name: Update Proxies
         run: python scripts/update_proxies.py
 
+      - name: Filter ChatGPT Proxies
+        run: python scripts/filter_chatgpt_proxies.py --timeout 8 --max-workers 30
+
       - name: Commit Changes If Any
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AUTHOR_NAME: ${{ secrets.GIT_AUTHOR_NAME }}
           AUTHOR_EMAIL: ${{ secrets.GIT_AUTHOR_EMAIL }}
         run: |
-          if git diff --quiet proxies.json; then
-            echo "No changes in proxies.json"
-            exit 0
-          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add proxies.json
-          git commit -m "Update proxies.json [skip ci]" --author="${AUTHOR_NAME} <${AUTHOR_EMAIL}>"
+          git add proxies.json outputs/chatgpt_http_proxies.txt outputs/chatgpt_socks5_proxies.txt outputs/chatgpt_all_proxies.txt outputs/chatgpt_proxy_test_results.json
+          if git diff --cached --quiet; then
+            echo "No changes in proxies.json or filtered outputs"
+            exit 0
+          fi
+          git commit -m "Update proxies and ChatGPT filtered outputs [skip ci]" --author="${AUTHOR_NAME} <${AUTHOR_EMAIL}>"
           git push
